@@ -1,92 +1,75 @@
-Monster Trading Card Game (MTCG) - README
+# Protocol – MTCG Semester Project
 
-Link to the project:
-https://github.com/thelegendofsonja/mtcg-lechner.git
+## Overview
 
-Project Overview
+This project is a Java implementation of a backend server for the Monster Trading Card Game (MTCG). It is built without any frameworks and follows the given requirements, including HTTP handling, token-based user authentication, persistence using PostgreSQL, and core game functionality like packages, decks, trading, and stats.
 
-This is an implementation of the Monster Trading Card Game (MTCG), built as a REST-based server in Java. The game allows users to collect, trade, and battle with cards. The server is implemented without an external HTTP framework, following the project specifications.
+The system is structured as a RESTful API and can be tested using curl or automated scripts. The project was developed individually as part of the 3rd semester, and this was the first time working seriously with Java.
 
-Features Implemented
+## App Design (Structure and Decisions)
 
-User Management: Register, login, and manage users.
+The application uses a custom server setup without HTTP helper libraries or frameworks. The structure is organized into the following packages:
 
-Card System: Cards with damage, element types (Fire, Water, Normal), and categories (Monster or Spell).
+- `restAPI/`: Handles incoming connections and routes HTTP requests using `HttpServer`, `ClientHandler`, and `Router`.
+- `controller/`: Contains logic for different features such as user handling, stats, and trading.
+- `repository/`: Responsible for interacting with the PostgreSQL database using raw SQL queries.
+- `model/`: Contains classes for core entities like `User`, `Card`, `Deck`, `Package`, and `Stats`.
 
-Deck Management: Users can configure decks with 4 cards for battles.
+Routing is handled manually using pattern matching in a custom `Router` class. User authentication is done using simple token-based security. The format is: `Authorization: Basic <username>-mtcgToken`.
 
-Trading System: Users can create and accept trading offers.
+User stats are automatically initialized upon registration so that `/stats` and `/score` always return consistent values.
 
-Battles: Users can engage in battles based on game logic.
+## Lessons Learned
 
-Scoreboard & Stats: Tracks ELO rankings and user stats.
+- Building an HTTP server from scratch was much harder than expected.
+- Understanding and working with HTTP headers and routing logic was a key challenge.
+- Using PostgreSQL without an ORM made SQL injection and query building important topics.
+- Writing tests helped catch errors early and made it easier to restructure code safely.
+- Keeping code modular (controllers, repositories) helps organize larger projects.
 
-Security: Authentication via tokens to ensure only authorized users perform actions.
+## Unit Testing Decisions
 
-Database Integration: PostgreSQL for persistent data storage.
+To ensure reliability, a focused testing approach was used:
 
-Custom Unique Feature: (Describe your unique feature here)
+- 20 unit tests were written using JUnit 5.
+- They cover important features like:
+  - User registration, login, and authentication
+  - Package creation and card assignment
+  - Deck rules like size limits and no duplicates
+  - Stats initialization and ELO sorting
+  - Secure profile editing and trading logic
 
-Installation & Setup
+The tests also include edge cases like:
 
-Requirements
+- Duplicate usernames
+- Invalid login or token access
+- Trying to buy when no packages are available
+- Invalid deck formats
 
-Java 17+
+Database operations were not mocked, but the tests focus on checking the core application logic.
+ Additionally, integration testing was done using a curl script that automatically runs through major endpoints to make sure everything works together as expected.
 
-PostgreSQL
+## Unique Feature
 
-Maven
+As a small extension, user stats are initialized automatically during registration. This avoids having to manually add stats later, and ensures `/stats` and `/score` always return valid data.
 
-Database Setup
+Also, the project checks that users can only access and update their own profile using tokens, which improves security and logic separation.
 
-Install PostgreSQL and create a database:
+## Tracked Time
 
-CREATE DATABASE mtcg;
+| Task                        | Hours                     |
+| --------------------------- | ------------------------- |
+| HTTP Server and Routing     | 8                         |
+| User Registration and Login | 6                         |
+| Database Integration        | 6                         |
+| Package and Card Features   | 6                         |
+| Deck Handling               | 5                         |
+| Trading Logic               | 6                         |
+| Stats and Scoreboard        | 4                         |
+| Unit and Integration Tests  | 8                         |
+| Documentation and Cleanup   | 4                         |
+| **Total**                   | **around 50 to 55 hours** |
 
-Create necessary tables (see docs/database_schema.sql).
+## Git Repository
 
-Update config.properties with your PostgreSQL credentials.
-
-Build and Run the Server
-
-Run the following commands:
-
-mvn clean install
-java -jar target/mtcg-server.jar
-
-The server starts on port 10001.
-
-API Endpoints
-
-POST /users - Register a new user
-POST /sessions - Login and get a token
-GET /cards - View all cards owned
-PUT /deck - Configure deck
-POST /battles - Start a battle
-GET /scoreboard - View leaderboard
-POST /tradings - Create a trade offer
-DELETE /tradings/{tradeId} - Cancel trade offer
-
-For full API details, see docs/API_Documentation.md.
-
-Running Tests
-
-To validate the implementation, run:
-
-mvn test
-
-Additionally, use the provided MonsterTradingCards.exercise.curl.bat script to test API functionality.
-
-Documentation
-
-Protocol Document: Monster-Trading-Card-Game-(MTCG)-Protocol-Lechner.md
-
-UML Diagram: mtcg-lechner-uml.png
-
-Additional Notes
-
-The server does not use an external HTTP framework.
-
-Business logic follows the battle mechanics and trade requirements outlined in the specification.
-
-Unique feature added: (Describe your unique feature here).
+https://github.com/thelegendofsonja/mtcg-lechner-Abgabe-2.git
